@@ -1,0 +1,145 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+
+body {
+    background: radial-gradient(circle at top left, #fff5f7 0%, #f4f6fa 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 16px;
+}
+
+/* Main Form Card */
+.form-container {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
+    width: 100%;
+    max-width: 720px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container h2 {
+    color: #222222;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    text-align: left;
+    letter-spacing: -0.5px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 16px;
+}
+
+/* Form Layout Groups */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Labels */
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #222222;
+    margin-bottom: 8px;
+    letter-spacing: 0.2px;
+}
+
+/* Inputs & Textareas */
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #222222;
+    background-color: #ffffff;
+    border: 1px solid #b0b0b0;
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Focus States (Signature Airbnb Glowing Ring) */
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #222222;
+    box-shadow: 0 0 0 2px #222222;
+}
+
+/* Placeholders */
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #fe424d;
+    font-weight: 400;
+}
+
+/* Airbnb Signature Coral/Pink Button */
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #e61e4d 0%, #e31c5f 50%, #d70466 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    box-shadow: 0 4px 14px rgba(227, 28, 95, 0.35);
+}
+
+.submit-btn:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 6px 20px rgba(227, 28, 95, 0.45);
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .form-container {
+        padding: 24px;
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}

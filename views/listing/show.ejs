@@ -1,0 +1,58 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5 mb-5">
+  <!-- Page Header -->
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <h2 class="mb-4 fw-bold text-dark"><%= listId.title %></h2>
+    </div>
+  </div>
+
+  <!-- Listing Card Container -->
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <!-- Listing Image -->
+        <img 
+          src="<%= listId.image %>" 
+          class="card-img-top show-img object-fit-cover" 
+          style="height: 400px;" 
+          alt="Listing Image"
+        >
+
+        <div class="card-body p-4">
+          <!-- Price and Location Sub-header -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary fw-semibold mb-0">
+              &#x20B9;<%= listId.price.toLocaleString("en-in") %> <span class="text-muted fs-6">/ night</span>
+            </h4>
+            <span class="badge bg-light text-dark border px-3 py-2 fs-6">
+              <%= listId.location %>, <%= listId.country %>
+            </span>
+          </div>
+
+          <hr class="text-muted my-3">
+
+          <!-- Description Section -->
+          <h5 class="fw-bold mb-2">About this place</h5>
+          <p class="card-text text-secondary lh-lg mb-4">
+            <%= listId.description %>
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="d-flex gap-3 align-items-center mt-4">
+            <a href="/listing/<%= listId._id %>/edit" class="btn btn-dark px-4 py-2 rounded-pill fw-medium">
+              Edit this listing
+            </a>
+            
+            <form method="post" action="/listing/<%= listId._id %>?_method=DELETE" class="mb-0">
+              <button type="submit" class="btn btn-outline-danger px-4 py-2 rounded-pill fw-medium">
+                Delete list
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
