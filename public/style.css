@@ -245,29 +245,20 @@ footer {
     font-size: 15px;
     color: #222222;
     background-color: #ffffff;
-    border: 1px solid #b0b0b0;
     border-radius: 12px;
-    outline: none;
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    transition: all 0.2s ease;
 }
 
 .form-group textarea {
     resize: vertical;
     min-height: 100px;
 }
-
-/* Focus States (Signature Airbnb Glowing Ring) */
-.form-group input:focus,
-.form-group textarea:focus {
-    border-color: #222222;
-    box-shadow: 0 0 0 2px #222222;
-}
-
 /* Placeholders */
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-    color: black;
-    /* font-weight: 400; */
+   color: black;
+   border: none !important;
+   opacity: 0.5;
 }
 .row {
     display: flex;

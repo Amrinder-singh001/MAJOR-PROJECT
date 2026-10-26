@@ -22,16 +22,20 @@
                                class="form-control"
                                value="<%= listId.title %>"
                                required>
+                        <div class="valid-feedback">Title updated!!</div>
+                        <div class="invalid-feedback">Title required..</div>
                     </div>
 
                     <!-- Listing Description -->
                     <div class="form-group">
                         <label for="description">What's your new description ?</label>
                         <textarea id="description"
-                                  name="description"
-                                  class="form-control"
-                                  rows="4"
-                                  required><%= listId.description %></textarea>
+                                name="description"
+                                class="form-control"
+                                rows="4"
+                                required><%= listId.description %></textarea>
+                        <div class="valid-feedback">Description updated!!</div>          
+                        <div class="invalid-feedback">Description is required..</div>
                     </div>
 
                     <!-- Image URL -->
@@ -41,7 +45,10 @@
                                id="image"
                                name="image"
                                class="form-control"
-                               value="<%= listId.image %>">
+                               value="<%= listId.image %>"
+                               required>
+                        <div class="valid-feedback">Image link updated!!</div>
+                        <div class="invalid-feedback">Image link reqired....</div>
                     </div>
 
                     <!-- Price and Country in Same Row -->
@@ -58,6 +65,8 @@
                                        min="0"
                                        value="<%= listId.price %>"
                                        required>
+                                <div class="valid-feedback">Price updated!!</div>  
+                                <div class="invalid-feedback">Price is compulsory..</div>    
                             </div>
                         </div>
 
@@ -71,6 +80,8 @@
                                        class="form-control"
                                        value="<%= listId.country %>"
                                        required>
+                                <div class="valid-feedback">Country updated!!</div>
+                                <div class="invalid-feedback">Country name required..</div>
                             </div>
                         </div>
 
@@ -85,6 +96,8 @@
                                class="form-control"
                                value="<%= listId.location %>"
                                required>
+                        <div class="valid-feedback">Location updated!!</div>
+                        <div class="invalid-feedback">Location required..</div>
                     </div>
 
                     <!-- Submit Button -->

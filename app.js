@@ -65,23 +65,22 @@ app.get("/listing/new", (req, res) => {
 })
 
 //route for accepting the post request after adding new list.
-app.post("/listings", (req, res) => {
-  let {title ,description, image, price, location, country} = req.body;
-   let addingNewList = new Listing({
-      title : title,
-      description : description,
-      image : image,
-      price : price,
-      location : location,
-      country : country
-   })
-   addingNewList.save()
-   .then((res) => {
-      console.log(res);
-   }).catch((err) =>{
-      console.log(err);
-   })
-   res.redirect("/listings");
+app.post("/listings", async (req, res, next) => {
+  try {
+    let {title ,description, image, price, location, country} = req.body;
+     let addingNewList = new Listing({
+        title : title,
+        description : description,
+        image : image,
+        price : price,
+        location : location,
+        country : country
+     })
+     let newChat = await addingNewList.save()
+     res.redirect("/listings");
+  } catch (error) {
+    next(error);
+  }
 })
 
 
@@ -94,22 +93,23 @@ app.get("/listing/:id/edit", async (req, res) => {
 
 //route for actaully edit form through an put request.
 app.put("/listing/:id", async (req, res) => {
-   let { id } = req.params;
-   let {title : newtitle, description : newdes, image : newimage, price : newprice, location : newloc, country : newcon} = req.body;
-  let updatedlist = await Listing.findByIdAndUpdate(id, 
-    {
-      title : newtitle,
-      description : newdes,
-      image : newimage,
-      price : newprice,
-      location : newloc,
-      country : newcon
-    }, 
-    {runValidators : true});
-  
-  //  await Listing.findByIdAndUpdate(id, {...req.body.Listing})
-    //  res.redirect(`/listings`);
-  res.redirect(`/show/list/${id}`);
+try {
+     let { id } = req.params;
+     let {title : newtitle, description : newdes, image : newimage, price : newprice, location : newloc, country : newcon} = req.body;
+    let updatedlist = await Listing.findByIdAndUpdate(id, 
+      {
+        title : newtitle,
+        description : newdes,
+        image : newimage,
+        price : newprice,
+        location : newloc,
+        country : newcon
+      }, 
+      {runValidators : true});
+    res.redirect(`/show/list/${id}`);
+} catch (err) {
+  next(err);
+}
 })
 
 //Delete route using a delete request
@@ -118,4 +118,11 @@ app.delete("/listing/:id", async(req, res) => {
   let deletedId = await Listing.findByIdAndDelete(id);
   console.log(deletedId);
   res.redirect("/listings")
+})
+
+
+
+//create a middleware for handling errors if they arrive.
+app.use((err, req, res, next) => {
+  res.status(500).send("Something went wrong! " + err.message);
 })
