@@ -5,6 +5,8 @@ let Listing = require("./models/listing.js");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsmate = require("ejs-mate");
+const wrapAsync = require("./utils/wrapAsync.js");
+const CustomError = require("./utils/CustomError.js");
 
 
 app.set("views", path.join(__dirname, "views"));
@@ -45,19 +47,20 @@ async function main() {
 app.get("/", (req, res) => {
   res.send("Hello, I'm Home")
 })
-
+ 
 // index route to show all lists.
-app.get("/listings", async (req, res) => {
+//Jo bi fn async hei usko hm wrapAsync mei convert krenge.
+app.get("/listings", wrapAsync(async (req, res) => {
   let allLists = await Listing.find({});
   res.render("listing/index.ejs", {allLists});
-})
+}))
 
 // route for showing specfic list at /list/show/:id
-app.get("/show/list/:id", async (req, res) => {
+app.get("/show/list/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     let listId = await Listing.findById(id);
     res.render("listing/show.ejs", { listId })
-})
+}))
 
 //route for creating new list
 app.get("/listing/new", (req, res) => {
@@ -65,8 +68,7 @@ app.get("/listing/new", (req, res) => {
 })
 
 //route for accepting the post request after adding new list.
-app.post("/listings", async (req, res, next) => {
-  try {
+app.post("/listings", wrapAsync(async (req, res, next) => {
     let {title ,description, image, price, location, country} = req.body;
      let addingNewList = new Listing({
         title : title,
@@ -78,22 +80,18 @@ app.post("/listings", async (req, res, next) => {
      })
      let newChat = await addingNewList.save()
      res.redirect("/listings");
-  } catch (error) {
-    next(error);
-  }
-})
+}))
 
 
 //route for showing only the edit form through an get request.
-app.get("/listing/:id/edit", async (req, res) => {
+app.get("/listing/:id/edit", wrapAsync(async (req, res) => {
   let { id } = req.params;
   let listId = await Listing.findById(id);
    res.render("listing/edit.ejs", {listId});
-})
+}))
 
 //route for actaully edit form through an put request.
-app.put("/listing/:id", async (req, res) => {
-try {
+app.put("/listing/:id", wrapAsync(async (req, res) => {
      let { id } = req.params;
      let {title : newtitle, description : newdes, image : newimage, price : newprice, location : newloc, country : newcon} = req.body;
     let updatedlist = await Listing.findByIdAndUpdate(id, 
@@ -107,22 +105,24 @@ try {
       }, 
       {runValidators : true});
     res.redirect(`/show/list/${id}`);
-} catch (err) {
-  next(err);
-}
-})
+}))
 
 //Delete route using a delete request
-app.delete("/listing/:id", async(req, res) => {
+app.delete("/listing/:id", wrapAsync (async(req, res) => {
   let {id} = req.params;
   let deletedId = await Listing.findByIdAndDelete(id);
   console.log(deletedId);
   res.redirect("/listings")
+}))
+
+
+// if no route is match or found then send a 404 error to the user through this route.
+app.all('/{*any}' ,(req, res, next) => {
+    next(new CustomError(404, "Page Not Found!!"));
 })
-
-
 
 //create a middleware for handling errors if they arrive.
 app.use((err, req, res, next) => {
-  res.status(500).send("Something went wrong! " + err.message);
+  let {statusCode = 500, message = "something went wrong"} = err;
+  res.status(statusCode).render("./Errors/error.ejs", {err});
 })
