@@ -21,16 +21,23 @@ body{
     font-size : 2rem;
     background-color: white;
 }
-
+.fa-buzz{
+    color: #fe424d;
+    font-size : 1.5rem;
+}
 .navbar-brand{
     color: #fe424d !important;
     border: none;
 }
+
+.navbar-brand b{
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 100px;
+}
 .nav-link{
     color: #222222 !important;
 }
-
-
 
 /* footer */
 footer {
@@ -114,7 +121,7 @@ footer {
 
 .f-info-links {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .f-info-links a {

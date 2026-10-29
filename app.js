@@ -7,12 +7,14 @@ const methodOverride = require("method-override");
 const ejsmate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const CustomError = require("./utils/CustomError.js");
+const { listingSchema } = require("./schema.js");
 
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({extended : true}));
+app.use(express.json());
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsmate);
 
@@ -43,6 +45,20 @@ async function main() {
   });
 }
 
+
+
+// function listingValidate is a middleware function that validates the request body against the listingSchema using Joi. If there is an error in validation, it throws a CustomError with a status code of 400 and the error message. If there is no error, it calls the next middleware function in the stack.
+const listingValidate = (req, res, next) => {
+  let {error} = listingSchema.validate(req.body);
+  console.log(error);
+
+  if (error) {
+    throw new CustomError(400, error.message);
+}else{
+    next();
+}}
+
+
 //Home route
 app.get("/", (req, res) => {
   res.send("Hello, I'm Home")
@@ -50,13 +66,17 @@ app.get("/", (req, res) => {
  
 // index route to show all lists.
 //Jo bi fn async hei usko hm wrapAsync mei convert krenge.
-app.get("/listings", wrapAsync(async (req, res) => {
+app.get("/listings",
+   listingValidate,
+   wrapAsync(async (req, res) => {
   let allLists = await Listing.find({});
   res.render("listing/index.ejs", {allLists});
 }))
 
 // route for showing specfic list at /list/show/:id
-app.get("/show/list/:id", wrapAsync(async (req, res) => {
+app.get("/show/list/:id",
+    listingValidate,
+    wrapAsync(async (req, res) => {
     let { id } = req.params;
     let listId = await Listing.findById(id);
     res.render("listing/show.ejs", { listId })
@@ -68,7 +88,10 @@ app.get("/listing/new", (req, res) => {
 })
 
 //route for accepting the post request after adding new list.
-app.post("/listings", wrapAsync(async (req, res, next) => {
+app.post("/listings", 
+   listingValidate,
+   wrapAsync(async (req, res, next) => {
+
     let {title ,description, image, price, location, country} = req.body;
      let addingNewList = new Listing({
         title : title,
@@ -84,14 +107,18 @@ app.post("/listings", wrapAsync(async (req, res, next) => {
 
 
 //route for showing only the edit form through an get request.
-app.get("/listing/:id/edit", wrapAsync(async (req, res) => {
+app.get("/listing/:id/edit", 
+  listingValidate,
+  wrapAsync(async (req, res) => {
   let { id } = req.params;
   let listId = await Listing.findById(id);
    res.render("listing/edit.ejs", {listId});
 }))
 
 //route for actaully edit form through an put request.
-app.put("/listing/:id", wrapAsync(async (req, res) => {
+app.put("/listing/:id", 
+  listingValidate,
+  wrapAsync(async (req, res) => {
      let { id } = req.params;
      let {title : newtitle, description : newdes, image : newimage, price : newprice, location : newloc, country : newcon} = req.body;
     let updatedlist = await Listing.findByIdAndUpdate(id, 
@@ -108,7 +135,8 @@ app.put("/listing/:id", wrapAsync(async (req, res) => {
 }))
 
 //Delete route using a delete request
-app.delete("/listing/:id", wrapAsync (async(req, res) => {
+app.delete("/listing/:id",
+  wrapAsync (async(req, res) => {
   let {id} = req.params;
   let deletedId = await Listing.findByIdAndDelete(id);
   console.log(deletedId);
