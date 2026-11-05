@@ -35,6 +35,10 @@ const listingSchema = new mongoose.Schema({
         type : String,
         required : true,
         runValidators : true,
+     },
+     reviews : {
+         type : Schema.Types.ObjectId,
+         ref : "Review"
      }
 })
 
