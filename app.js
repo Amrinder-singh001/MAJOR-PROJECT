@@ -8,6 +8,7 @@ const ejsmate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const CustomError = require("./utils/CustomError.js");
 const { listingSchema } = require("./schema.js");
+const Review = require("./models/reviews.js");
 
 
 app.set("views", path.join(__dirname, "views"));
@@ -143,7 +144,23 @@ app.delete("/listing/:id",
   res.redirect("/listings")
 }))
 
+//  Reviews :-> post route -> in this route we will create a review for a specific listing and then save it in the database.
+app.post("/listing/:id/reviews", async (req, res) => {
+  let {rating : newRating, comment : newComment} = req.body;
+  let {id} = req.params;
+   let listing = await Listing.findById(id);
+   let newReview = new Review({
+    rating : newRating,
+    comment : newComment
+   })
 
+    listing.reviews.push(newReview);
+    await listing.save();
+    await newReview.save();
+
+    console.log(newReview);
+    res.send(`<h1>Review Added Successfully</h1><br><a href="/show/list/${req.params.id}">Go Back</a>`);
+})
 // if no route is match or found then send a 404 error to the user through this route.
 app.all('/{*any}' ,(req, res, next) => {
     next(new CustomError(404, "Page Not Found!!"));

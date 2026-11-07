@@ -57,7 +57,7 @@
             <h4 class="fw-bold mb-4">
               Leave a review
             </h4>
-            <form action="/listings">
+            <form action="/listing/<%= listId._id %>/reviews" method="POST">
               <div>
                 <label  class="form-label mb-4"for="rating">Rating</label>
                 <input class="form-range" type="range" id="rating" name="rating" min="1" max="5">

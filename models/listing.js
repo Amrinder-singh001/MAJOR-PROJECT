@@ -36,10 +36,12 @@ const listingSchema = new mongoose.Schema({
         required : true,
         runValidators : true,
      },
-     reviews : {
+     reviews : [
+      {
          type : Schema.Types.ObjectId,
          ref : "Review"
      }
+   ]
 })
 
 const Listing = new mongoose.model("Listing", listingSchema);
