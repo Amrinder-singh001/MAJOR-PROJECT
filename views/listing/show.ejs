@@ -1,6 +1,6 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="container mt-5 mb-5">
+<div class="container mt-5">
   <!-- Page Header -->
   <div class="row justify-content-center">
     <div class="col-lg-8">
@@ -57,22 +57,97 @@
             <h4 class="fw-bold mb-4">
               Leave a review
             </h4>
-            <form action="/listing/<%= listId._id %>/reviews" method="POST">
+            <form action="/listing/<%= listId._id %>/reviews" method="POST" novalidate class="needs-validation">
               <div>
                 <label  class="form-label mb-4"for="rating">Rating</label>
                 <input class="form-range" type="range" id="rating" name="rating" min="1" max="5">
               </div>  
               <div>
                 <label class="form-label mb-4"  for="comment">Comments</label>
-                <textarea class="form-control" id="comment" name="comment" rows="5" cols="30"></textarea>
+                <textarea style="border-radius: 20px;" class="form-control" id="comment" name="comment" rows="5" cols="30" required></textarea>
+                <div class="invalid-feedback">Tell something about yo'rs experience.</div>
               </div>
              <br>
               <button type="submit" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-medium">
                 Submit
               </button>  
             </form>
-          </div>
+            <!-- <hr class="text-muted my-3"> -->
+            
+
+
+
+<hr class="text-muted my-4">
+<div class="reviews-section mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="fa-regular fa-comments me-2"></i>
+            Guest Reviews
+        </h4>
+        <span class="badge bg-light text-dark border rounded-pill px-3 py-2">
+            <%= listId.reviews.length %> Reviews
+        </span>
+    </div>
+
+    <% if (listId.reviews.length === 0) { %>
+
+        <div class="text-center py-5 bg-light rounded-4">
+            <i class="fa-regular fa-comment-dots fs-1 text-secondary mb-3"></i>
+            <h5 class="fw-semibold">No Reviews Yet</h5>
+            <p class="text-muted mb-0">
+                Be the first to share your experience!
+            </p>
+        </div>
+
+    <% } else { %>
+
+        <div class="row g-3">
+            <% listId.reviews.forEach(review => { %>
+
+                <div class="col-12 col-md-6">
+                    <div class="card review-card h-100 border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="review-rating">
+                                    <i class="fa-solid fa-star text-warning"></i>
+                                    <strong><%= review.rating %></strong>
+                                    <span class="text-muted">/ 5</span>
+                                </div>
+
+                                <span class="badge bg-success-subtle text-success rounded-pill">
+                                    Verified Review
+                                </span>
+                            </div>
+
+                            <p class="card-text review-comment mb-4">
+                                <%= review.comment %>
+                            </p>
+
+                            <hr class="text-muted opacity-25">
+
+                            <div class="d-flex align-items-center text-muted small">
+                                <i class="fa-regular fa-calendar me-2"></i>
+                                Reviewed on
+                                <span class="ms-1 fw-semibold">
+                                    <%= review.created_at ? new Date(review.created_at).toLocaleDateString('en-IN') : 'Date unavailable' %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+
+
+
         </div> 
       </div>
     </div>
+  </div>
+  </div>
   </div>

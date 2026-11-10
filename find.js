@@ -31,17 +31,24 @@ async function main() {
     });
 };
 
-showCollections();
+// showCollections();
 }
 
 const findListing = async() => {
   let res = await Review.find({rating : 5});
   console.log(res);
 }
-findListing();
+// findListing();
 
 const find = async() => {
-    let res = await Review.find({});
+    let res = await Review.find({_id : "6aba158e7b641c5868918c86"});
     console.log(res);
   }
-//   find();
+  find();
+
+
+  const del = async () =>{
+      let res = await Review.deleteMany({});
+      console.log(res);
+  }
+  // del();

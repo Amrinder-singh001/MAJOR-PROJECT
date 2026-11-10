@@ -13,6 +13,7 @@
 
 const joi = require("joi");
 
+// serverSide validaton for listings
 module.exports.listingSchema = joi.object({
     title: joi.string().required(),
     description: joi.string().required(),
@@ -21,3 +22,10 @@ module.exports.listingSchema = joi.object({
     location: joi.string().required(),
     country: joi.string().required(),
 });
+
+
+// serverSide validaton for Reviews
+module.exports.reviewSchema = joi.object({
+        rating: joi.number().required().max(5).min(1),
+        comment: joi.string().required(),
+})

@@ -9,6 +9,7 @@ const wrapAsync = require("./utils/wrapAsync.js");
 const CustomError = require("./utils/CustomError.js");
 const { listingSchema } = require("./schema.js");
 const Review = require("./models/reviews.js");
+const { reviewSchema } = require("./schema.js");
 
 
 app.set("views", path.join(__dirname, "views"));
@@ -60,6 +61,19 @@ const listingValidate = (req, res, next) => {
 }}
 
 
+
+// function reviewValidate is a middleware function that validates the request body against the reviewSchema using Joi. If there is an error in validation, it throws a CustomError with a status code of 400 and the error message. If there is no error, it calls the next middleware function in the stack.
+const reviewValidate = (req, res, next) => {
+  let {error} = reviewSchema.validate(req.body);
+  console.log(error);
+
+  if (error) {
+    throw new CustomError(400, error.message);
+}else{
+    next();
+}}
+
+
 //Home route
 app.get("/", (req, res) => {
   res.send("Hello, I'm Home")
@@ -74,20 +88,25 @@ app.get("/listings",
   res.render("listing/index.ejs", {allLists});
 }))
 
+
+
+
 // route for showing specfic list at /list/show/:id
 app.get("/show/list/:id",
     listingValidate,
     wrapAsync(async (req, res) => {
     let { id } = req.params;
-    let listId = await Listing.findById(id);
+    let listId = await Listing.findById(id).populate("reviews");
     res.render("listing/show.ejs", { listId })
 }))
+
+
+
 
 //route for creating new list
 app.get("/listing/new", (req, res) => {
    res.render("listing/new.ejs");
 })
-
 //route for accepting the post request after adding new list.
 app.post("/listings", 
    listingValidate,
@@ -107,6 +126,8 @@ app.post("/listings",
 }))
 
 
+
+
 //route for showing only the edit form through an get request.
 app.get("/listing/:id/edit", 
   listingValidate,
@@ -115,7 +136,6 @@ app.get("/listing/:id/edit",
   let listId = await Listing.findById(id);
    res.render("listing/edit.ejs", {listId});
 }))
-
 //route for actaully edit form through an put request.
 app.put("/listing/:id", 
   listingValidate,
@@ -135,6 +155,8 @@ app.put("/listing/:id",
     res.redirect(`/show/list/${id}`);
 }))
 
+
+
 //Delete route using a delete request
 app.delete("/listing/:id",
   wrapAsync (async(req, res) => {
@@ -144,8 +166,12 @@ app.delete("/listing/:id",
   res.redirect("/listings")
 }))
 
+
+
+
+
 //  Reviews :-> post route -> in this route we will create a review for a specific listing and then save it in the database.
-app.post("/listing/:id/reviews", async (req, res) => {
+app.post("/listing/:id/reviews", reviewValidate, wrapAsync(async (req, res) => {
   let {rating : newRating, comment : newComment} = req.body;
   let {id} = req.params;
    let listing = await Listing.findById(id);
@@ -160,11 +186,16 @@ app.post("/listing/:id/reviews", async (req, res) => {
 
     console.log(newReview);
     res.send(`<h1>Review Added Successfully</h1><br><a href="/show/list/${req.params.id}">Go Back</a>`);
-})
+}))
+
+
+
 // if no route is match or found then send a 404 error to the user through this route.
 app.all('/{*any}' ,(req, res, next) => {
     next(new CustomError(404, "Page Not Found!!"));
 })
+
+
 
 //create a middleware for handling errors if they arrive.
 app.use((err, req, res, next) => {
