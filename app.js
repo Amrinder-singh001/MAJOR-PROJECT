@@ -185,10 +185,18 @@ app.post("/listing/:id/reviews", reviewValidate, wrapAsync(async (req, res) => {
     await newReview.save();
 
     console.log(newReview);
-    res.send(`<h1>Review Added Successfully</h1><br><a href="/show/list/${req.params.id}">Go Back</a>`);
+    res.redirect(`/show/list/${req.params.id}`);
 }))
 
-
+// Delete review [route]
+app.delete("/listing/:id/reviews/:reviewId", wrapAsync(async (req, res) => {
+  let {id, reviewId} = req.params;
+  let listing = await Listing.findById(id);
+  listing.reviews.pull(reviewId);
+  await listing.save();
+  await Review.findByIdAndDelete(reviewId);
+  res.redirect(`/show/list/${req.params.id}`);
+}))
 
 // if no route is match or found then send a 404 error to the user through this route.
 app.all('/{*any}' ,(req, res, next) => {

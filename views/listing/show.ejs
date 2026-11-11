@@ -1,3 +1,4 @@
+
 <% layout("/layouts/boilerplate") %>
 
 <div class="container mt-5">
@@ -11,7 +12,9 @@
   <!-- Listing Card Container -->
   <div class="row justify-content-center">
     <div class="col-lg-8">
+
       <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+
         <!-- Listing Image -->
         <img 
           src="<%= listId.image %>" 
@@ -21,11 +24,14 @@
         >
 
         <div class="card-body p-4">
+
           <!-- Price and Location Sub-header -->
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="text-primary fw-semibold mb-0">
-              &#x20B9;<%= listId.price.toLocaleString("en-in") %> <span class="text-muted fs-6">/ night</span>
+              &#x20B9;<%= listId.price.toLocaleString("en-in") %>
+              <span class="text-muted fs-6">/ night</span>
             </h4>
+
             <span class="badge bg-light text-dark border px-3 py-2 fs-6">
               <%= listId.location %>, <%= listId.country %>
             </span>
@@ -35,6 +41,7 @@
 
           <!-- Description Section -->
           <h5 class="fw-bold mb-2">About this place</h5>
+
           <p class="card-text text-secondary lh-lg mb-4">
             <%= listId.description %>
           </p>
@@ -44,110 +51,101 @@
             <a href="/listing/<%= listId._id %>/edit" class="btn btn-dark px-4 py-2 rounded-pill fw-medium">
               Edit this listing
             </a>
-            
+
             <form method="post" action="/listing/<%= listId._id %>?_method=DELETE" class="mb-0">
               <button type="submit" class="btn btn-outline-danger px-4 py-2 rounded-pill fw-medium">
                 Delete list
               </button>
             </form>
           </div>
+
           <br>
+
+          <!-- Leave a Review -->
           <div class="mt-4">
             <hr class="text-muted my-3">
-            <h4 class="fw-bold mb-4">
+
+            <h4 class="mb-4">
               Leave a review
             </h4>
+
             <form action="/listing/<%= listId._id %>/reviews" method="POST" novalidate class="needs-validation">
+
               <div>
-                <label  class="form-label mb-4"for="rating">Rating</label>
+                <label class="form-label mb-4" for="rating">Rating</label>
                 <input class="form-range" type="range" id="rating" name="rating" min="1" max="5">
-              </div>  
-              <div>
-                <label class="form-label mb-4"  for="comment">Comments</label>
-                <textarea style="border-radius: 20px;" class="form-control" id="comment" name="comment" rows="5" cols="30" required></textarea>
-                <div class="invalid-feedback">Tell something about yo'rs experience.</div>
               </div>
-             <br>
+
+              <div>
+                <label class="form-label mb-4" for="comment">Comments</label>
+                <textarea style="border-radius: 20px;" class="form-control" id="comment" name="comment" rows="5" cols="30" required></textarea>
+
+                <div class="invalid-feedback">
+                  Tell something about yo'rs experience.
+                </div>
+              </div>
+
+              <br>
+
               <button type="submit" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-medium">
                 Submit
-              </button>  
+              </button>
+
             </form>
-            <!-- <hr class="text-muted my-3"> -->
-            
+          </div>
 
+          <!-- Guest Reviews -->
+          <hr class="my-4">
 
+          <h4>Guest Reviews</h4>
 
-<hr class="text-muted my-4">
-<div class="reviews-section mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">
-            <i class="fa-regular fa-comments me-2"></i>
-            Guest Reviews
-        </h4>
-        <span class="badge bg-light text-dark border rounded-pill px-3 py-2">
-            <%= listId.reviews.length %> Reviews
-        </span>
-    </div>
+          <p class="text-muted"><%= listId.reviews.length %> Reviews</p>
 
-    <% if (listId.reviews.length === 0) { %>
+          <% if (listId.reviews.length === 0) { %>
 
-        <div class="text-center py-5 bg-light rounded-4">
-            <i class="fa-regular fa-comment-dots fs-1 text-secondary mb-3"></i>
-            <h5 class="fw-semibold">No Reviews Yet</h5>
-            <p class="text-muted mb-0">
-                Be the first to share your experience!
+            <p style="margin-bottom: 0px;">No reviews yet.
+              <p class="text-muted">Be! the first to leave a review.</p>
             </p>
-        </div>
 
-    <% } else { %>
+          <% } else { %>
 
-        <div class="row g-3">
-            <% listId.reviews.forEach(review => { %>
+            <div class="row g-3">
+              <% listId.reviews.forEach(review => { %>
 
-                <div class="col-12 col-md-6">
-                    <div class="card review-card h-100 border-0 shadow-sm rounded-4">
-                        <div class="card-body p-4">
+                <div class="col-6 mb-3">
+                  <div style="border: 1px solid #e5e5e5 !important;" class="card p-4 h-100 border border-light rounded-4 shadow-sm">
 
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="review-rating">
-                                    <i class="fa-solid fa-star text-warning"></i>
-                                    <strong><%= review.rating %></strong>
-                                    <span class="text-muted">/ 5</span>
-                                </div>
+                    <p>
+                      ⭐&nbsp;&nbsp;<strong><%= review.rating %></strong>/5
+                      <span class="text-success">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified Review</span>
+                    </p>
 
-                                <span class="badge bg-success-subtle text-success rounded-pill">
-                                    Verified Review
-                                </span>
-                            </div>
+                    <p><%= review.comment %></p>
+                    <form action="/listing/<%= listId._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST" class="mb-0">
+                      <button type="delete" class="btn btn-outline-dark rounded-pill fw-medium">
+                        Delete
+                      </button>
+                    </form>
 
-                            <p class="card-text review-comment mb-4">
-                                <%= review.comment %>
-                            </p>
+                    <hr>
 
-                            <hr class="text-muted opacity-25">
+                    <small class="text-muted">
+                      Reviewed on
+                      <%= review.created_at
+                        ? new Date(review.created_at).toLocaleDateString('en-IN')
+                        : 'Date unavailable' %>
+                    </small>
 
-                            <div class="d-flex align-items-center text-muted small">
-                                <i class="fa-regular fa-calendar me-2"></i>
-                                Reviewed on
-                                <span class="ms-1 fw-semibold">
-                                    <%= review.created_at ? new Date(review.created_at).toLocaleDateString('en-IN') : 'Date unavailable' %>
-                                </span>
-                            </div>
-
-                        </div>
-                    </div>
+                  </div>
                 </div>
 
-            <% }) %>
+              <% }) %>
+            </div>
+
+          <% } %>
+
         </div>
-    <% } %>
-</div>
-
-
-
-        </div> 
       </div>
     </div>
   </div>
-  </div>
-  </div>
+</div>
