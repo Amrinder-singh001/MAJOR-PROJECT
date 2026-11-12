@@ -35,16 +35,16 @@ async function main() {
 }
 
 const findListing = async() => {
-  let res = await Review.find({rating : 5});
+  let res = await Review.find({});
   console.log(res);
 }
-// findListing();
+findListing();
 
 const find = async() => {
     let res = await Review.find({_id : "6aba158e7b641c5868918c86"});
     console.log(res);
   }
-  find();
+  // find();
 
 
   const del = async () =>{

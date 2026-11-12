@@ -1,7 +1,8 @@
 // for listing models
-
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const Review = require("./reviews");
+
 const listingSchema = new mongoose.Schema({
      title: {
         type : String,
@@ -43,6 +44,20 @@ const listingSchema = new mongoose.Schema({
      }
    ]
 })
+
+
+
+// mongoose middleware 
+// why : Jab hum apni Listing delete karte hain, toh us listing ke saath jo reviews attached hain, woh bhi automatically delete hone chahiye isliye.
+listingSchema.post("findOneAndDelete", async function(listing) {
+      if (listing) {
+         await mongoose.model("Review").deleteMany({
+             _id: { $in: listing.reviews } 
+         });
+      }
+});
+
+
 
 const Listing = new mongoose.model("Listing", listingSchema);
 module.exports = Listing;
