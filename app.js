@@ -1,6 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const app = express();
+const mongoose = require("mongoose");
 let Listing = require("./models/listing.js");
 const path = require("path");
 const methodOverride = require("method-override");
@@ -10,6 +10,7 @@ const CustomError = require("./utils/CustomError.js");
 const { listingSchema } = require("./schema.js");
 const Review = require("./models/reviews.js");
 const { reviewSchema } = require("./schema.js");
+const listings = require("./routes/listings.js");
 
 
 app.set("views", path.join(__dirname, "views"));
@@ -74,6 +75,8 @@ const reviewValidate = (req, res, next) => {
 }}
 
 
+app.use("/listing", listings);
+
 //Home route
 app.get("/", (req, res) => {
   res.send("Hello, I'm Home")
@@ -81,7 +84,7 @@ app.get("/", (req, res) => {
  
 // index route to show all lists.
 //Jo bi fn async hei usko hm wrapAsync mei convert krenge.
-app.get("/listings",
+app.get("/listing",
    listingValidate,
    wrapAsync(async (req, res) => {
   let allLists = await Listing.find({});
