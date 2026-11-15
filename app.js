@@ -11,6 +11,7 @@ const { listingSchema } = require("./schema.js");
 const Review = require("./models/reviews.js");
 const { reviewSchema } = require("./schema.js");
 const listings = require("./routes/listings.js");
+const reviews = require("./routes/reviews.js");
 
 
 app.set("views", path.join(__dirname, "views"));
@@ -48,164 +49,12 @@ async function main() {
   });
 }
 
+app.use("/listings", listings);
+app.use("/listings/:id/reviews", reviews);
 
-
-// function listingValidate is a middleware function that validates the request body against the listingSchema using Joi. If there is an error in validation, it throws a CustomError with a status code of 400 and the error message. If there is no error, it calls the next middleware function in the stack.
-const listingValidate = (req, res, next) => {
-  let {error} = listingSchema.validate(req.body);
-  console.log(error);
-
-  if (error) {
-    throw new CustomError(400, error.message);
-}else{
-    next();
-}}
-
-
-
-// function reviewValidate is a middleware function that validates the request body against the reviewSchema using Joi. If there is an error in validation, it throws a CustomError with a status code of 400 and the error message. If there is no error, it calls the next middleware function in the stack.
-const reviewValidate = (req, res, next) => {
-  let {error} = reviewSchema.validate(req.body);
-  console.log(error);
-
-  if (error) {
-    throw new CustomError(400, error.message);
-}else{
-    next();
-}}
-
-
-app.use("/listing", listings);
-
-//Home route
-app.get("/", (req, res) => {
-  res.send("Hello, I'm Home")
-})
- 
-// index route to show all lists.
-//Jo bi fn async hei usko hm wrapAsync mei convert krenge.
-app.get("/listing",
-   listingValidate,
-   wrapAsync(async (req, res) => {
-  let allLists = await Listing.find({});
-  res.render("listing/index.ejs", {allLists});
-}))
-
-
-
-
-// route for showing specfic list at /list/show/:id
-app.get("/show/list/:id",
-    listingValidate,
-    wrapAsync(async (req, res) => {
-    let { id } = req.params;
-    let listId = await Listing.findById(id).populate("reviews");
-    res.render("listing/show.ejs", { listId })
-}))
-
-
-
-
-//route for creating new list
-app.get("/listing/new", (req, res) => {
-   res.render("listing/new.ejs");
-})
-//route for accepting the post request after adding new list.
-app.post("/listings", 
-   listingValidate,
-   wrapAsync(async (req, res, next) => {
-
-    let {title ,description, image, price, location, country} = req.body;
-     let addingNewList = new Listing({
-        title : title,
-        description : description,
-        image : image,
-        price : price,
-        location : location,
-        country : country
-     })
-     let newChat = await addingNewList.save()
-     res.redirect("/listings");
-}))
-
-
-
-
-//route for showing only the edit form through an get request.
-app.get("/listing/:id/edit", 
-  listingValidate,
-  wrapAsync(async (req, res) => {
-  let { id } = req.params;
-  let listId = await Listing.findById(id);
-   res.render("listing/edit.ejs", {listId});
-}))
-//route for actaully edit form through an put request.
-app.put("/listing/:id", 
-  listingValidate,
-  wrapAsync(async (req, res) => {
-     let { id } = req.params;
-     let {title : newtitle, description : newdes, image : newimage, price : newprice, location : newloc, country : newcon} = req.body;
-    let updatedlist = await Listing.findByIdAndUpdate(id, 
-      {
-        title : newtitle,
-        description : newdes,
-        image : newimage,
-        price : newprice,
-        location : newloc,
-        country : newcon
-      }, 
-      {runValidators : true});
-    res.redirect(`/show/list/${id}`);
-}))
-
-
-
-//Delete route using a delete request
-app.delete("/listing/:id",
-  wrapAsync (async(req, res) => {
-  let {id} = req.params;
-  let deletedId = await Listing.findByIdAndDelete(id);
-  console.log(deletedId);
-  res.redirect("/listings")
-}))
-
-
-
-
-
-//  Reviews :-> post route -> in this route we will create a review for a specific listing and then save it in the database.
-app.post("/listing/:id/reviews", reviewValidate, wrapAsync(async (req, res) => {
-  let {rating : newRating, comment : newComment} = req.body;
-  let {id} = req.params;
-   let listing = await Listing.findById(id);
-   let newReview = new Review({
-    rating : newRating,
-    comment : newComment
-   })
-
-    listing.reviews.push(newReview);
-    await listing.save();
-    await newReview.save();
-
-    console.log(newReview);
-    res.redirect(`/show/list/${req.params.id}`);
-}))
-
-// Delete review [route]
-app.delete("/listing/:id/reviews/:reviewId", wrapAsync(async (req, res) => {
-  let {id, reviewId} = req.params;
-  let listing = await Listing.findById(id);
-  listing.reviews.pull(reviewId);
-  await listing.save();
-  await Review.findByIdAndDelete(reviewId);
-  res.redirect(`/show/list/${req.params.id}`);
-}))
-
-// if no route is match or found then send a 404 error to the user through this route.
 app.all('/{*any}' ,(req, res, next) => {
     next(new CustomError(404, "Page Not Found!!"));
 })
-
 
 
 //create a middleware for handling errors if they arrive.

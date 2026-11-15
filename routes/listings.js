@@ -3,13 +3,13 @@ const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const CustomError = require("../utils/CustomError.js");
 const { listingSchema } = require("../schema.js");
-const Review = require("../models/reviews.js");
 const { reviewSchema } = require("../schema.js");
 let Listing = require("../models/listing.js");
 const mongoose = require("mongoose");
 
 
 
+// function listingValidate is a middleware function that validates the request body against the listingSchema using Joi. If there is an error in validation, it throws a CustomError with a status code of 400 and the error message. If there is no error, it calls the next middleware function in the stack.
 const listingValidate = (req, res, next) => {
     let {error} = listingSchema.validate(req.body);
     console.log(error);
@@ -19,28 +19,34 @@ const listingValidate = (req, res, next) => {
   }else{
       next();
   }}
-    
+  
 
-const reviewValidate = (req, res, next) => {
-    let {error} = reviewSchema.validate(req.body);
-    console.log(error);
-  
-    if (error) {
-      throw new CustomError(400, error.message);
-  }else{
-      next();
-  }}
-  
-  
+// index route to show all lists.(Home route)
+//Jo bi fn async hei usko hm wrapAsync mei convert krenge.
+router.get("/",
+  listingValidate,
+  wrapAsync(async (req, res) => {
+ let allLists = await Listing.find({});
+ res.render("listing/index.ejs", {allLists});
+}))
 
 //route for creating new list
 router.get("/new", (req, res) => {
     res.render("listing/new.ejs");
  })
  
+ // route for showing specfic list at /list/show/:id
+router.get("/:id",
+  listingValidate,
+  wrapAsync(async (req, res) => {
+  let { id } = req.params;
+  let listId = await Listing.findById(id).populate("reviews");
+  res.render("listing/show.ejs", { listId })
+}))
+
  
  // 2 route for accepting the post request after adding new list.
- router.post("/listings", 
+ router.post("/", 
     listingValidate,
     wrapAsync(async (req, res, next) => {
  
@@ -81,7 +87,7 @@ router.get("/:id/edit",
           country : newcon
         }, 
         {runValidators : true});
-      res.redirect(`/show/list/${id}`);
+      res.redirect(`/listings/${id}`);
   }))
 
   
@@ -93,34 +99,5 @@ router.get("/:id/edit",
     console.log(deletedId);
     res.redirect("/listings")
   }))
-  
-  //  Reviews :-> post route -> in this route we will create a review for a specific listing and then save it in the database.
-  router.post("/:id/reviews", reviewValidate, wrapAsync(async (req, res) => {
-    let {rating : newRating, comment : newComment} = req.body;
-    let {id} = req.params;
-     let listing = await Listing.findById(id);
-     let newReview = new Review({
-      rating : newRating,
-      comment : newComment
-     })
-  
-      listing.reviews.push(newReview);
-      await listing.save();
-      await newReview.save();
-  
-      console.log(newReview);
-      res.redirect(`/show/list/${req.params.id}`);
-  }))
-  
-  // Delete review [route]
-  router.delete("/:id/reviews/:reviewId", wrapAsync(async (req, res) => {
-    let {id, reviewId} = req.params;
-    let listing = await Listing.findById(id);
-    listing.reviews.pull(reviewId);
-    await listing.save();
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/show/list/${req.params.id}`);
-  }))
-  
 
   module.exports = router;
