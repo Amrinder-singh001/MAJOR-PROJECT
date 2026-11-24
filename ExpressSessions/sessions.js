@@ -1,6 +1,8 @@
 const express = require("express");
 const session = require("express-session");
+const connectFlash = require("connect-flash")
 const app = express();
+const path = require("path")
 
 
 // Session :- A session is a way to store information (in variables) to be used across multiple pages. Unlike cookies, the information is not stored on the user's computer. Sessions are commonly used for user authentication, shopping carts, and other scenarios where you need to maintain state between requests. In Express.js, you can use the `express-session` middleware to manage sessions easily.
@@ -22,7 +24,10 @@ const sessionOptions = {
     saveUninitialized : true
 };
 
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 app.use(session(sessionOptions));
+app.use(connectFlash());
 
 app.listen(3001, () => {
     console.log("Server is running on port 3001");
@@ -48,14 +53,31 @@ app.get("/countsession", (req, res) => {
 // How to Store and Use sessions.
 // we can store sessions for
 app.get("/register", (req, res) => {
-    let{ name = "Anonymoous" } = req.query;
+    let{ name = "Anonymous" } = req.query;
     req.session.name = name;
     console.log(req.session);
-    res.redirect("/hello")
-    console.log(name);
+    if(name === "Anonymous"){
+        req.flash("failure", `User not registered`)
+    }else{
+        req.flash("success", `${name}! has successfully registered👍`)
+    }
+    res.redirect("/register1")
 })
 
-app.get("/hello", (req, res) => {ee
-    res.send(`Hello, ${req.session.name}`);
-    console.log(req.session);
+// app.get("/hello", (req, res) => {ee
+//     res.send(`Hello, ${req.session.name}`);
+//     console.log(req.session);
+// })
+
+
+// Now we understand the concept of connect-flash.
+// connect-flash : 
+
+app.get("/register1", (req, res) => {
+    // related concept to the connect-flash is : res.locals
+    res.locals.successmsg = req.flash("success");
+    res.locals.failuremsg = req.flash("failure");
+    res.render("page.ejs", {name : req.session.name});
 })
+
+// related concept to the connect-flash is : res.locals
