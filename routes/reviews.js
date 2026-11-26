@@ -36,6 +36,7 @@ const reviewValidate = (req, res, next) => {
   
       console.log(newReview);
       console.log(id);
+      req.flash("success", "New Review Added Sucessfully!");
       res.redirect(`/listings/${req.params.id}`);
   }))
   
@@ -46,6 +47,7 @@ const reviewValidate = (req, res, next) => {
     listing.reviews.pull(reviewId);
     await listing.save();
     await Review.findByIdAndDelete(reviewId);
+    req.flash("success", "Review Deleted Sucessfully!");
     res.redirect(`/listings/${req.params.id}`);
   }))
 

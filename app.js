@@ -12,7 +12,20 @@ const Review = require("./models/reviews.js");
 const { reviewSchema } = require("./schema.js");
 const listings = require("./routes/listings.js");
 const reviews = require("./routes/reviews.js");
+const sessions = require("express-session");
+const flash = require("connect-flash");
 
+
+const sessionOptions = {
+  secret : "mysuperstring",
+  resave : false,
+  saveUninitialized : true,
+  httpOnly : true,
+  cookie : {
+    expires : Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge : 7 * 24 * 60 * 60 * 1000
+  }
+}
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -20,6 +33,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
 app.use(methodOverride("_method"));
+app.use(sessions(sessionOptions));
+app.use(flash());
 app.engine("ejs", ejsmate);
 
 let port = 8080;
@@ -49,6 +64,12 @@ async function main() {
   });
 }
 
+app.use((req, res, next) => {
+   res.locals.successMsg = req.flash("success");
+   res.locals.errorMsg = req.flash("error");
+   next();
+})
+// app.use is a method
 app.use("/listings", listings);
 app.use("/listings/:id/reviews", reviews);
 
