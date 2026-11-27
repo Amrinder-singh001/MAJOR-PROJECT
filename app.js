@@ -14,6 +14,10 @@ const listings = require("./routes/listings.js");
 const reviews = require("./routes/reviews.js");
 const sessions = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const User = require("./models/user.js");
+// const { default: passportLocalMongoose } = require("passport-local-mongoose");
 
 
 const sessionOptions = {
@@ -36,6 +40,14 @@ app.use(methodOverride("_method"));
 app.use(sessions(sessionOptions));
 app.use(flash());
 app.engine("ejs", ejsmate);
+
+//for authentication process
+app.use(passport.initialize());
+app.use(passport.session())
+app.use(passport._deserializers());
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 let port = 8080;
 app.listen(port, ()=>{
@@ -68,6 +80,15 @@ app.use((req, res, next) => {
    res.locals.successMsg = req.flash("success");
    res.locals.errorMsg = req.flash("error");
    next();
+})
+
+app.get("/demouser", async (req, res) => {
+  let fakeUser = new User({
+    email : "abcd@gmail.com",
+    username : "Amrinder singh"
+  })
+  let registedUser = await User.register(fakeUser, "Howareyoumerijaan");
+  res.send(registedUser);
 })
 // app.use is a method
 app.use("/listings", listings);
