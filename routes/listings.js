@@ -7,6 +7,7 @@ const { reviewSchema } = require("../schema.js");
 let Listing = require("../models/listing.js");
 const mongoose = require("mongoose");
 const flash = require("connect-flash");
+const { isLoggedIn } = require("../middleware.js");
 
 
 // function listingValidate is a middleware function that validates the request body against the listingSchema using Joi. If there is an error in validation, it throws a CustomError with a status code of 400 and the error message. If there is no error, it calls the next middleware function in the stack.
@@ -31,13 +32,14 @@ router.get("/",
 }))
 
 //route for creating new list
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
     res.render("listing/new.ejs");
  })
  
  // route for showing specfic list at /list/show/:id
 router.get("/:id",
   listingValidate,
+  isLoggedIn,
   wrapAsync(async (req, res) => {
   let { id } = req.params;
   let listId = await Listing.findById(id).populate("reviews");
@@ -52,6 +54,7 @@ router.get("/:id",
  // 2 route for accepting the post request before adding new list.
  router.post("/", 
     listingValidate,
+    isLoggedIn,
     wrapAsync(async (req, res, next) => {
      let {title ,description, image, price, location, country} = req.body;
       let addingNewList = new Listing({
@@ -70,6 +73,7 @@ router.get("/:id",
 //route for showing only the edit form through an get request.
 router.get("/:id/edit", 
     listingValidate,
+    isLoggedIn,
     wrapAsync(async (req, res) => {
     let { id } = req.params;
     let listId = await Listing.findById(id);
@@ -78,6 +82,7 @@ router.get("/:id/edit",
   //route for actaully edit form through an put request.
   router.put("/:id", 
     listingValidate,
+    isLoggedIn,
     wrapAsync(async (req, res) => {
        let { id } = req.params;
        let {title : newtitle, description : newdes, image : newimage, price : newprice, location : newloc, country : newcon} = req.body;
@@ -98,6 +103,7 @@ router.get("/:id/edit",
   
   //Delete route using a delete request
   router.delete("/:id",
+    isLoggedIn,
     wrapAsync (async(req, res) => {
     let {id} = req.params;
     let deletedId = await Listing.findByIdAndDelete(id);

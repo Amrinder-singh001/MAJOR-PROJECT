@@ -13,6 +13,33 @@
         <a class="nav-link" href="/listings">All Listings</a>
         <a class="nav-link" href="/listings/new">Add new Listing</a>
       </div>
+      <!-- <div class="navbar-nav" style="margin-left: 340px">
+        <a class="nav-link" aria-current="page" href="/signup">SignUp</a>
+        <a class="nav-link" href="/login">LogIn</a> -->
+    <% if(!currUser){ %>
+      <form action="/signup">
+        <button type="submit"
+        class="btn btn-danger rounded-pill fw-sm" style="margin-left: 450px;">
+        Sign up
+        </button>
+      </form>
+      <form action="/login">
+        <button type="submit"
+        class="btn btn-outline-primary rounded-pill fw-sm" style="margin-left: 10px;">
+        Log in
+        </button>
+      </form>
+    <% } %>
+
+    <% if(currUser){ %>
+        <form action="/logout">
+          <button type="submit"
+          class="btn btn-dark rounded-pill fw-sm ms-auto" style="margin-left: 450px;">
+          Log out
+          </button>
+        </form>
+      <% } %>
+      </div>
     </div>
   </div>
 </nav>

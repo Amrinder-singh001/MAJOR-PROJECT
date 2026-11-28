@@ -10,13 +10,14 @@ const CustomError = require("./utils/CustomError.js");
 const { listingSchema } = require("./schema.js");
 const Review = require("./models/reviews.js");
 const { reviewSchema } = require("./schema.js");
-const listings = require("./routes/listings.js");
-const reviews = require("./routes/reviews.js");
+const listingsRouter = require("./routes/listings.js");
+const reviewsRouter = require("./routes/reviews.js");
 const sessions = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const localStrategy = require("passport-local");
 const User = require("./models/user.js");
+const UserRouter = require("./routes/user.js");
 // const { default: passportLocalMongoose } = require("passport-local-mongoose");
 
 
@@ -44,7 +45,6 @@ app.engine("ejs", ejsmate);
 //for authentication process
 app.use(passport.initialize());
 app.use(passport.session())
-app.use(passport._deserializers());
 passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
@@ -79,9 +79,11 @@ async function main() {
 app.use((req, res, next) => {
    res.locals.successMsg = req.flash("success");
    res.locals.errorMsg = req.flash("error");
+   res.locals.currUser = req.user;
    next();
 })
 
+// simple rouute for user like an demo
 app.get("/demouser", async (req, res) => {
   let fakeUser = new User({
     email : "abcd@gmail.com",
@@ -91,8 +93,9 @@ app.get("/demouser", async (req, res) => {
   res.send(registedUser);
 })
 // app.use is a method
-app.use("/listings", listings);
-app.use("/listings/:id/reviews", reviews);
+app.use("/listings", listingsRouter);
+app.use("/listings/:id/reviews", reviewsRouter);
+app.use("/", UserRouter);
 
 app.all('/{*any}' ,(req, res, next) => {
     next(new CustomError(404, "Page Not Found!!"));
